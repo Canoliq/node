@@ -11,7 +11,7 @@ NODE_COMPOSE := docker-compose.yml
 MONITORING_COMPOSE := docker-compose.monitoring.yml
 FULL_COMPOSE := docker compose -f $(NODE_COMPOSE) -f $(MONITORING_COMPOSE)
 
-.PHONY: help hash-password up down restart logs status validate snapshot init-keys
+.PHONY: help hash-password up down restart logs status validate gen-key
 
 help: ## Show available targets
 	@grep -hE '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -22,7 +22,7 @@ hash-password: ## Generate a bcrypt hash for AUTH_PASSWORDHASH (prompts for pass
 	docker run --rm -i caddy:2.10-alpine caddy hash-password -p "$$pw" | sed 's/\$$/\$$\$$/g'
 	@echo "Copy the exact line above into .env"
 
-pull: ## Pull the latest canopynetwork/canopy image
+pull: ## Pull the latest canopynetwork/canopy-plugin-go image
 	$(FULL_COMPOSE) pull node
 
 node-up: ## Start the node only (no monitoring)
@@ -43,14 +43,9 @@ logs: ## Tail node logs
 status: ## Show container status
 	$(FULL_COMPOSE) ps
 
-snapshot: ## Download mainnet snapshots into data/ (stops nodes first)
-	./scripts/snapshot.sh
-
-snapshot-up: snapshot up ## Download mainnet snapshots into data/ and start nodes
-
 gen-key: ## First-boot: generate validator key
 	@docker run --rm -it \
 		--entrypoint /bin/cli \
 		-v "$(CURDIR)/config:/app/config" \
-		canopynetwork/canopy:latest \
+		canopynetwork/canopy-plugin-go:latest \
 		new-validator-key --data-dir /app/config

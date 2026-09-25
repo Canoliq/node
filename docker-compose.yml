@@ -1,21 +1,43 @@
 services:
   node:
-    image: canopynetwork/canopy:latest
-    container_name: node
+    # canoLiq runs a custom plugin. The stock `canopynetwork/canopy` image has
+    # no plugin/auto-update logic, so a node built on it will never load the
+    # canoLiq protocol.
+    image: canopynetwork/canopy-plugin-go:latest
+    container_name: canoliq-node
     restart: unless-stopped
     command: ["start", "--external-address", "${DOMAIN:-localhost}"]
+    environment:
+      # The plugin binary is multi-mode. WITHOUT this it starts as the base-SDK
+      # "send tutorial" -- the node looks healthy, produces blocks, and runs
+      # none of canoLiq. Chain 29 shipped that way for a day before anyone
+      # noticed, because nothing about it looks wrong from the outside.
+      CANOPY_PLUGIN_MODE: canoliq
+      # canoLiq mode binds its RPC here. NOT 50010, which is only the base-SDK
+      # default -- point a /plugin route at the wrong one and it 404s while
+      # everything else appears fine.
+      CANOLIQ_RPC_ADDR: "0.0.0.0:8587"
+      CANOLIQ_CONFIG: /root/.canopy/canoliq/canoliq-config.json
     ports:
-      - "9001:9001" # TCP P2P
+      # 9000 + chainId. Chain 29 -> 9029. This is NOT 9001: that is chain 1's
+      # port, and anyone joining committee 29 is already running a chain-1 node
+      # on it. Must be reachable from the internet or the committee cannot
+      # dial you (see README "Before you stake").
+      - "9029:9029"
     expose:
       - "50000" # Wallet
       - "50001" # Explorer
       - "50002" # RPC
       - "50003" # Admin RPC
+      - "8587"  # canoLiq plugin RPC
     volumes:
       - ./data:/root/.canopy
       - ./config/genesis.json:/root/.canopy/genesis.json:ro
       - ./config/config.json:/root/.canopy/config.json:ro
       - ./config/keystore.json:/root/.canopy/keystore.json
+      # canoLiq plugin genesis + config. Mounted read-only: both files are
+      # consensus-critical and must be byte-identical across every node.
+      - ./config/canoliq:/root/.canopy/canoliq:ro
     secrets:
       - source: validator_key
         target: /root/.canopy/validator_key.json
@@ -25,15 +47,15 @@ services:
           memory: 4G
           cpus: "2.0"
 
-  # First-time setup: generate validator credentials in ./config
-  # (creates keystore.json and validator_key.json).
-  # Run from the repository root:
-  # docker run --rm -it \
-  #   --entrypoint /bin/cli \
-  #   -v "$(pwd)/config:/app/config" \
-  #   canopynetwork/canopy:latest \
-  #   new-validator-key --data-dir /app/config
-  # Or alternatively: make gen-key
+  # First-time setup: generate validator credentials into ./config
+  # (creates keystore.json and validator_key.json). See `make init-keys`.
+  keygen:
+    image: canopynetwork/canopy-plugin-go:latest
+    entrypoint: /bin/cli
+    command: ["new-validator-key", "--data-dir", "/app/config"]
+    volumes:
+      - ./config:/app/config
+    profiles: ["tools"]
 
 secrets:
   validator_key:

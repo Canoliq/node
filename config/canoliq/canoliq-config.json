@@ -1,0 +1,9 @@
+{
+  "profile": "mainnet",
+  "chainId": 29,
+  "dataDirPath": "/tmp/plugin",
+  "rpcAddress": "0.0.0.0:8587",
+  "redemptionUnstakingBlocks": 30240,
+  "genesisPath": "/root/.canopy/canoliq/genesis.mainnet.json",
+  "activationHeight": 4679
+}
