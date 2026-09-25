@@ -1,143 +1,278 @@
 {
-  "validators": [
-    {
-      "address": "9c51a2b9b9234865a61cd43aae7f899441ae6271",
-      "publicKey": "8ad02e9b05e418f198e89179685a48b227f1c2bc266d4db002f24f8155c5119cbb9387146319b5dc4a260184f20d5d4f",
-      "committees": [1, 2],
-      "netAddress": "tcp://cnpy.xyz",
-      "stakedAmount": 1,
-      "output": "cf228862bd36016c0154e789d5fabe584da31c7e"
+    "time": "2026-09-22 20:00:47",
+    "pools": [
+      {
+        "id": 32768,
+        "amount": 25000000000000,
+        "points": [
+          {
+            "address": "deaddeaddeaddeaddeaddeaddeaddeaddeaddead",
+            "points": 100
+          }
+        ],
+        "totalPoints": 100
+      }
+    ],
+    "accounts": [
+      {
+        "address": "d5c74cd0eba543f4fc4ad92a541250e29838d82d",
+        "amount": 54012850451178
+      },
+      {
+        "address": "b78416a7d24a10b4ed3b2f79c139724be89dc5d3",
+        "amount": 18176052392343
+      },
+      {
+        "address": "14082fa4d210043b60e6d018096c03794b19d482",
+        "amount": 1105191676684
+      },
+      {
+        "address": "0677ebf740cfd5366cfb1cf6c54684d37ee59fca",
+        "amount": 764287866946
+      },
+      {
+        "address": "7d58f7e4fb42023e255b3bba1f4d6694bfe2087b",
+        "amount": 244494591824
+      },
+      {
+        "address": "35c550ac6a5f483df8a606d1e4b04824d41d25dc",
+        "amount": 102231507592
+      },
+      {
+        "address": "55e8ead718babb4f310602ec8749b323c2108ce5",
+        "amount": 44307542829
+      },
+      {
+        "address": "cdeb8afd7cdce170a5fd61313f233f664678bfdf",
+        "amount": 38077819703
+      },
+      {
+        "address": "a22dfb99af9f4c193ba9100cfd76797e3a9c9d37",
+        "amount": 37892635267
+      },
+      {
+        "address": "6eb3075d68dc0b504cf47db801c4b9395c06cf6d",
+        "amount": 36979936372
+      },
+      {
+        "address": "3fb8b55d267f1abd6e62f4d8fe7f9219b63cecb4",
+        "amount": 36003093428
+      },
+      {
+        "address": "2a70434c21c3282753b1b77ecd202d8f3698b225",
+        "amount": 33304707672
+      },
+      {
+        "address": "f372ac37091e52a6c56815977eb70e4fee798e19",
+        "amount": 32568173077
+      },
+      {
+        "address": "7224bf3adf7498f99cc5b55d0a07f950efcfe3f0",
+        "amount": 30642501208
+      },
+      {
+        "address": "fee634c57abc7f47452a87f0533acff508e39a5e",
+        "amount": 29583709283
+      },
+      {
+        "address": "47a218a35224b36445008a5808e66cc90bd64678",
+        "amount": 29341739466
+      },
+      {
+        "address": "7e9f179d3eef1f5d40041730da6357a8d01f6313",
+        "amount": 27471565660
+      },
+      {
+        "address": "ccf9dddf4ef8c249049867159551ea142ea19a58",
+        "amount": 24776054221
+      },
+      {
+        "address": "725f4f9983aaa3c60cc318bff1a196f86c65eb97",
+        "amount": 24187747978
+      },
+      {
+        "address": "6254a59b88d1add229e41b588f03a2437964f87f",
+        "amount": 21601972143
+      },
+      {
+        "address": "d33310193a179666d7403e2e18c3cd343d39c64c",
+        "amount": 19730637690
+      },
+      {
+        "address": "a3528f7afec2c6dc31a542f9008ac0b0d1b774ad",
+        "amount": 15533098544
+      },
+      {
+        "address": "0cfe5530531d2834b1dec2a01bf5bb54f0737577",
+        "amount": 13379959668
+      },
+      {
+        "address": "f359321d0e6fb2861c70ae1d8b87ee6d8801d69f",
+        "amount": 13188272029
+      },
+      {
+        "address": "c975dbe347b2dd15a892882f2630edc876e9efe8",
+        "amount": 9198145835
+      },
+      {
+        "address": "40b29b337fc476d1f3fb58341b6346895b0cec38",
+        "amount": 8420385154
+      },
+      {
+        "address": "7cb7d397329ec37f6142f27deac01d9226146d85",
+        "amount": 8097466771
+      },
+      {
+        "address": "5550e7734e4bd600045326b4aead8056a8275083",
+        "amount": 5497425804
+      },
+      {
+        "address": "37a5c2f6ff7467eb3655735bdf9e6421f5024a2e",
+        "amount": 5497039466
+      },
+      {
+        "address": "dcfdf13c3508c388d04837949efeffa1340c9c12",
+        "amount": 5495484522
+      },
+      {
+        "address": "421c24836091f9f33b5dd8fb17802793a931120e",
+        "amount": 5454460259
+      },
+      {
+        "address": "5f50ba26d44072735dbf7cbe09b0ab10c1a4a409",
+        "amount": 5453786035
+      },
+      {
+        "address": "d7bafda73caafb5fc761b198b1b59c640965649d",
+        "amount": 5416125393
+      },
+      {
+        "address": "1fc6673721758ed25c872503c9b3b8e80965cff6",
+        "amount": 4485881647
+      },
+      {
+        "address": "354e3bc1e230c5f496e54f6de2dc71481d0fb3f3",
+        "amount": 3850483143
+      },
+      {
+        "address": "14e3054bdac7f0beb0d382fcef028c629dcf427b",
+        "amount": 2928112979
+      },
+      {
+        "address": "246e1e7087d3626b5cb6635378d2dd6ab4bbbcec",
+        "amount": 2637550187
+      },
+      {
+        "address": "2d78acfc6b10e71e8ed35c11c5d0d49fb6eddd4c",
+        "amount": 1776000000
+      },
+      {
+        "address": "31cf492b38b1c2ea7c49a9b862301b16311a4219",
+        "amount": 888000000
+      },
+      {
+        "address": "0a4e3f93429840c2aecab256484b967ffe5b6c3c",
+        "amount": 888000000
+      },
+      {
+        "address": "363b59bf0fae81384d5df227b3d1d17fb9b23577",
+        "amount": 888000000
+      },
+      {
+        "address": "c3a647327785664a2c77e992dc82436bcb8ca90c",
+        "amount": 888000000
+      },
+      {
+        "address": "6511b6dad379240c87cf726c9dddd3ad4591d2bd",
+        "amount": 888000000
+      },
+      {
+        "address": "a8f32fe50d6a6c4915bcaff61c4293c5e95859ee",
+        "amount": 888000000
+      },
+      {
+        "address": "472016657a029b4074e325c292ff01bf0523d58f",
+        "amount": 888000000
+      },
+      {
+        "address": "f5e7e7dac0f3f001b2803999585688ca48f17539",
+        "amount": 888000000
+      },
+      {
+        "address": "c770ba7031bf7d23099ae66510b5dc91bfb8577b",
+        "amount": 888000000
+      },
+      {
+        "address": "40d881e7af69550555258df0de01c74e9f181130",
+        "amount": 888000000
+      },
+      {
+        "address": "718b94bb3618228742659edc67cd1b4fd9ceb742",
+        "amount": 888000000
+      },
+      {
+        "address": "95bc75a47fce737fbe12659b4aacd1a97fe4c0b6",
+        "amount": 888000000
+      },
+      {
+        "address": "35f5f4646b830af230d7b03ab75682455b9b3110",
+        "amount": 888000000
+      },
+      {
+        "address": "4ba48b2f72a01fa833b43ac134a7b341e3783650",
+        "amount": 568000000
+      }
+    ],
+    "nonSigners": null,
+    "params": {
+      "consensus": {
+        "blockSize": 1000000,
+        "protocolVersion": "1/0",
+        "rootChainID": 1,
+        "resetCommittee": 0
+      },
+      "validator": {
+        "unstakingBlocks": 2,
+        "maxPauseBlocks": 4380,
+        "doubleSignSlashPercentage": 10,
+        "nonSignSlashPercentage": 1,
+        "maxNonSign": 3,
+        "nonSignWindow": 5,
+        "maxCommittees": 15,
+        "maxCommitteeSize": 100,
+        "earlyWithdrawalPenalty": 20,
+        "delegateUnstakingBlocks": 2,
+        "minimumOrderSize": 1000000000,
+        "stakePercentForSubsidizedCommittee": 33,
+        "maxSlashPerCommittee": 15,
+        "delegateRewardPercentage": 10,
+        "buyDeadlineBlocks": 60,
+        "lockOrderFeeMultiplier": 2,
+        "minimumStakeForValidators": 0,
+        "minimumStakeForDelegates": 0,
+        "maximumDelegatesPerCommittee": 0
+      },
+      "fee": {
+        "sendFee": 10000,
+        "stakeFee": 10000,
+        "editStakeFee": 10000,
+        "unstakeFee": 10000,
+        "pauseFee": 10000,
+        "unpauseFee": 10000,
+        "changeParameterFee": 10000,
+        "daoTransferFee": 10000,
+        "certificateResultsFee": 0,
+        "subsidyFee": 10000,
+        "createOrderFee": 10000,
+        "editOrderFee": 10000,
+        "deleteOrderFee": 10000,
+        "dexLimitOrderFee": 0,
+        "dexLiquidityDeposit": 0,
+        "dexLiquidityWithdraw": 0
+      },
+      "governance": {
+        "daoRewardPercentage": 5
+      }
     },
-    {
-      "address": "5bc4bd9a3468889febdc6a73df0090b12a263eb4",
-      "publicKey": "90703d453dfa70af3c85f3605e6cc8222d01d68d439ee5a9ade10be631572b330e1793206c8d417d9693be1d5af417fe",
-      "committees": [1, 2],
-      "netAddress": "tcp://cnpy.network",
-      "stakedAmount": 1,
-      "output": "faef35fb62796dfd6dfb9b19ea3d4be130a97257"
-    },
-    {
-      "address": "997634c57ad60414116dc59417db6829c209f1df",
-      "publicKey": "89c592a8a27bc2ba3783048ebad2ee77b67ce8db1d3706d19135fac44e71d459870791d8face14dde4df6262a6445a27",
-      "committees": [1, 2],
-      "netAddress": "tcp://minerstellar.com",
-      "stakedAmount": 1,
-      "output": "12ee25b30f3016e3427983c1fb75eabab025a2d5"
-    },
-    {
-      "address": "ac2c2eb9aa04b99ec9a523b09ca844a77826c291",
-      "publicKey": "b1891c2a38b553279b46452a4ecc49fa42ecb7c71a27f39efa5b3f817481b443cb44da9be251fa571d1ac43dd5ef7fd9",
-      "committees": [1, 2],
-      "netAddress": "tcp://agentofthecrown.com",
-      "stakedAmount": 1,
-      "output": "330d139fd014ec84c15b9786f9934a5a95a02d25"
-    },
-    {
-      "address": "a843153e432b2b3052e50cfb37bbd021e9cbd34c",
-      "publicKey": "b338f09135994130bee5da939513241b5d01ba5e73c409ed5ecea597b86a8b9c05fd27fb5e47a7296350fbae6262a484",
-      "committees": [1, 2],
-      "netAddress": "tcp://cnpynetwork.com",
-      "stakedAmount": 1,
-      "output": "1202c3f3ac5e4876f9b35774858ca16e129ceba1"
-    },
-    {
-      "address": "5946f3adf4965295b816a40b719ff79e9fd1dba2",
-      "publicKey": "8794c211342dc0da348b16e4e5903ffd7f913c390bd29dbfad0c44b891b08a99d74bc90546d89b54098ac7c0c5331550",
-      "committees": [1, 2],
-      "netAddress": "tcp://dun3waves.xyz",
-      "stakedAmount": 1,
-      "output": "3b7d461b533ff5b7ec28d172656b8049f29e5b11"
-    },
-    {
-      "address": "51f334c0e137b99aa8fc9eae3a71064c2ccf8208",
-      "publicKey": "99e38bdc8b7c7f9f8a67151da78994a2616ac127518d4dd8f5a08ad760921758269fcb5172713b9585ec7007f60cb6fe",
-      "committees": [1, 2],
-      "netAddress": "tcp://canopynode.cam",
-      "stakedAmount": 1,
-      "output": "3dad3f4dcb6e0411a6acfc66c3d8850aff9789e4"
-    },
-    {
-      "address": "8b243551a78f5380d6ba5b1e84fee34b23f6e757",
-      "publicKey": "a329a705dab85db2fd950cef9ffd87e27ff4b91b929d5ab26e6efb40b1b3b45e74f7d8162822c49b9909893e6461cc8d",
-      "committees": [1, 2],
-      "netAddress": "tcp://uem44.com",
-      "stakedAmount": 1,
-      "output": "b70bd2f4a87a43597c9c78d65dc3192090fdaa6f"
-    },
-    {
-      "address": "fc5cdb5c0b6a6df41b92976bbdf2b6832855446f",
-      "publicKey": "b17d4eb3938957e710bacc9f09d2a9aa79a568fcdf1f8fc565bdb5de3f334295e929e4b086b9c8e9610654155fb0452b",
-      "committees": [1, 2],
-      "netAddress": "tcp://canopycoin.xyz",
-      "stakedAmount": 1,
-      "output": "a59917b6d045327d4a39736fea81b72e1891692e"
-    },
-    {
-      "address": "4e2ce94661e2e3fd3af02e21898803c4d74e84ba",
-      "publicKey": "ab4fe218bb09a27908c6181fc799b8371d895f13173fed5b924af60235a548cd882ba97f911c08d9bda34c46a7dab359",
-      "committees": [1, 2],
-      "netAddress": "tcp://cryptoicp.com",
-      "stakedAmount": 1,
-      "output": "bc01362a7bd2613a3786ce32007452fd51f2bf1b"
-    },
-    {
-      "address": "33e14ef6b87fb688b829c5e29618bb549dc7b4cd",
-      "publicKey": "b346ad1f1809adc64d4a06e5be4d9960a018faada129d659623fd97846d5127de550218929ec9de4af9d9cbd1ec52d46",
-      "committees": [1, 2],
-      "netAddress": "tcp://lava-9.com",
-      "stakedAmount": 1,
-      "output": "b587ddd8b58134c61ec52e5b1e88a27a5e07be82"
-    },
-    {
-      "address": "b9c6c2dfa9d049e480c8cec9c29463abf078a594",
-      "publicKey": "9174b24ba27fe8a0f8616bf1a382d81428ef8a94b7ff70916bb9b266c9070bd848e49a0c33a1c17553416c949ea3409a",
-      "committees": [1, 2],
-      "netAddress": "tcp://cleanmarro.com",
-      "stakedAmount": 1,
-      "output": "8f5633ac35fc17fe113b8ecaa2060289607c0352"
-    }
-  ],
-  "params": {
-    "consensus": {
-      "blockSize": 1000000,
-      "protocolVersion": "1/0",
-      "rootChainID": 1
-    },
-    "validator": {
-      "unstakingBlocks": 30240,
-      "maxPauseBlocks": 30240,
-      "doubleSignSlashPercentage": 10,
-      "nonSignSlashPercentage": 1,
-      "maxNonSign": 60,
-      "nonSignWindow": 100,
-      "maxCommittees": 16,
-      "maxCommitteeSize": 100,
-      "earlyWithdrawalPenalty": 0,
-      "delegateUnstakingBlocks": 12960,
-      "minimumOrderSize": 1000000000,
-      "stakePercentForSubsidizedCommittee": 33,
-      "maxSlashPerCommittee": 15,
-      "delegateRewardPercentage": 0,
-      "buyDeadlineBlocks": 60,
-      "lockOrderFeeMultiplier": 2
-    },
-    "fee": {
-      "sendFee": 10000,
-      "stakeFee": 10000,
-      "editStakeFee": 10000,
-      "unstakeFee": 10000,
-      "pauseFee": 10000,
-      "unpauseFee": 10000,
-      "changeParameterFee": 10000,
-      "daoTransferFee": 10000,
-      "certificateResultsFee": 0,
-      "subsidyFee": 10000,
-      "createOrderFee": 10000,
-      "editOrderFee": 10000,
-      "deleteOrderFee": 10000
-    },
-    "governance": {
-      "daoRewardPercentage": 5
-    }
+    "supply": null
   }
-}

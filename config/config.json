@@ -1,11 +1,11 @@
 {
   "logLevel": "debug",
-  "chainId": 1,
+  "chainId": 29,
   "sleepUntil": 0,
   "rootChain": [
     {
       "chainId": 1,
-      "url": "http://node:50002"
+      "url": "<your-chain-1-rpc>"
     }
   ],
   "runVDF": true,
@@ -22,15 +22,13 @@
   "dbName": "canopy",
   "inMemory": false,
   "networkID": 1,
-  "listenAddress": "0.0.0.0:9001",
-  "externalAddress": "localhost",
+  "listenAddress": "0.0.0.0:9029",
+  "externalAddress": "tcp://<your-public-host>",
   "maxInbound": 21,
   "maxOutbound": 7,
   "trustedPeerIDs": null,
   "dialPeers": [
-    "b1891c2a38b553279b46452a4ecc49fa42ecb7c71a27f39efa5b3f817481b443cb44da9be251fa571d1ac43dd5ef7fd9@tcp://agentofthecrown.com:9030",
-    "9353441f5319ca7b9ee2f8bd764a8c75e3b6b7b13a18b0c4e5252bc0b1232861318b3063255238edc1fb96f08fa2157a@tcp://canopy.seed1.node1.eu.nodefleet.net",
-    "a3d591f2e602fd18df7c94abf02f6d342939570b169886bb355e6879cd7b9dda8c5d825f7895336d4e29750e65fc65df@tcp://canopy.seed1.node1.us.nodefleet.net"
+    "adbcc520a81c3c046edc78b0290032225a6fb2982a8d54850390410f27a3fa16ccf58e121137086ba19a818f37ef0864@tcp://cnlq.val-a.grad.app.canopynetwork.org:9029"
   ],
   "bannedPeerIDs": null,
   "bannedIPs": null,
