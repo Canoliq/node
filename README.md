@@ -97,6 +97,11 @@ breaks the link inside the old container.
 
 ## 3. Join the committee — last, not first
 
+> [!TIP]
+> Step-by-step version for validators already running chain 1:
+> [`docs/JOIN-COMMITTEE.md`](docs/JOIN-COMMITTEE.md)
+
+
 Only once all four checks pass, add committee `29` to your existing chain-1
 validator with an edit-stake. No new key, no unstaking; it is one field.
 
