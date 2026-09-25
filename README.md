@@ -73,6 +73,16 @@ nc -z <your-host> 9029
 If height sticks at **4679** with `unequal block hash` in the logs, your plugin
 config is missing or wrong — see "Why the plugin config matters" below.
 
+If height sticks at **2** with `unequal block hash` (a different `stateRoot`),
+`config.json` is missing chain 29's emission parameters (`initialTokensPerBlock`,
+`blocksPerHalvening`). Without them the node mints chain 1's default reward
+every block and diverges immediately. Use this repo's `config.json` as-is.
+
+If the container restart-loops with `canopy binary not found` after you wiped
+`data/`, recreate it: `docker compose up -d --force-recreate node`. The image
+links `/bin/cli` to a file inside the data directory, and wiping the directory
+breaks the link inside the old container.
+
 > [!NOTE]
 > **There is no snapshot, and you do not need one.** Chain 29 is young, so a
 > node syncs from genesis to the tip in roughly twenty minutes. (The snapshot
@@ -98,8 +108,13 @@ affect liveness and need no node at all.
 
 ## Why the plugin config matters
 
-canoLiq is a plugin on top of canopy, and two files in `config/canoliq/` are
-**consensus-critical**:
+canoLiq is a plugin on top of canopy. `config.json` must load it:
+`"plugin": "go"` starts it, and `pluginAutoUpdate` (`Canoliq/canoliq`) is where the
+node downloads it from and keeps it current. canoLiq ships consensus changes as
+plugin releases pinned to future heights, so a node without auto-update falls
+off the chain at the next activation height.
+
+Two files in `config/canoliq/` are **consensus-critical**:
 
 | | |
 |---|---|
@@ -142,8 +157,10 @@ curl -s -X POST <your-chain-1-rpc>/v1/query/root-chain-info \
 ```
 
 Each entry in `validatorSet` gives a `publicKey` and a `netAddress`. A dial peer
-is `<publicKey>@<netAddress>:9029` — the port is **derived**, since `netAddress`
-does not carry one.
+is `<publicKey>@<host>` **with no port**. Canopy derives the P2P port by adding
+the chain ID to whatever port it is given (`lib.ResolvePort`). With no port it
+starts from the default 9000, so chain 29 lands on 9029. Writing `:9029`
+explicitly makes it dial 9029 + 29 = **9058**, which nobody listens on.
 
 ## Monitoring
 
