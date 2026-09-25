@@ -38,6 +38,12 @@ make gen-key
 docker compose up -d
 ```
 
+> [!IMPORTANT]
+> **`DOMAIN` in `.env` overrides `externalAddress` in `config.json`.** The
+> compose runs `start --external-address ${DOMAIN:-localhost}`, and that flag
+> wins. Set `DOMAIN` as well, or the node advertises `localhost` and no peer
+> can reach it — while `config.json` still looks correct.
+
 **On `rootChain`.** Chain 29 follows chain 1, so the node needs a chain-1 RPC.
 If you already run a chain-1 node on this box — most committee members do —
 point it there over the local docker network (e.g.
