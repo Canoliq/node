@@ -1,5 +1,11 @@
 services:
-  node:
+  # Named "canoliq", not "node", on purpose. Compose publishes the SERVICE name
+  # as a DNS alias on every network the service joins -- so a service called
+  # "node" here would answer to "node" on the chain-1 network too, colliding
+  # with the chain-1 container of that name. "http://node:50002" would then
+  # resolve to THIS container's own RPC: the node would follow itself as its
+  # root chain, connect successfully, and be quietly wrong.
+  canoliq:
     # canoLiq runs a custom plugin. The stock `canopynetwork/canopy` image has
     # no plugin/auto-update logic, so a node built on it will never load the
     # canoLiq protocol.

@@ -9,6 +9,7 @@ endif
 
 NODE_COMPOSE := docker-compose.yml
 MONITORING_COMPOSE := docker-compose.monitoring.yml
+ROOTCHAIN_COMPOSE := docker-compose.rootchain-local.yml
 FULL_COMPOSE := docker compose -f $(NODE_COMPOSE) -f $(MONITORING_COMPOSE)
 
 .PHONY: help hash-password up down restart logs status validate gen-key
@@ -23,10 +24,13 @@ hash-password: ## Generate a bcrypt hash for AUTH_PASSWORDHASH (prompts for pass
 	@echo "Copy the exact line above into .env"
 
 pull: ## Pull the latest canopynetwork/canopy-plugin-go image
-	$(FULL_COMPOSE) pull node
+	$(FULL_COMPOSE) pull canoliq
 
 node-up: ## Start the node only (no monitoring)
-	docker compose -f $(NODE_COMPOSE) up -d node
+	docker compose -f $(NODE_COMPOSE) up -d canoliq
+
+node-up-local-rootchain: ## Start the node, joined to a chain-1 node on this machine
+	docker compose -f $(NODE_COMPOSE) -f $(ROOTCHAIN_COMPOSE) up -d canoliq
 
 up: ## Starts everything (node, monitoring, etc.)
 	$(FULL_COMPOSE) up -d
@@ -35,10 +39,10 @@ down: ## Stop everything
 	$(FULL_COMPOSE) --profile monitoring down
 
 restart: ## Restart the nodes (reload config.json changes)
-	$(FULL_COMPOSE) restart node
+	$(FULL_COMPOSE) restart canoliq
 
 logs: ## Tail node logs
-	docker compose -f $(NODE_COMPOSE) logs -f node --tail 200
+	docker compose -f $(NODE_COMPOSE) logs -f canoliq --tail 200
 
 status: ## Show container status
 	$(FULL_COMPOSE) ps

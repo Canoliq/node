@@ -45,10 +45,32 @@ docker compose up -d
 > can reach it — while `config.json` still looks correct.
 
 **On `rootChain`.** Chain 29 follows chain 1, so the node needs a chain-1 RPC.
-If you already run a chain-1 node on this box — most committee members do —
-point it there over the local docker network (e.g.
-`http://node:50002`); it is lower latency than a public endpoint and one less
-third party in your consensus path. Otherwise use any chain-1 RPC you trust.
+The simplest option, and the one to use unless you have a reason not to:
+
+```json
+"rootChain": [{ "chainId": 1, "url": "https://root.net.app.canopynetwork.org" }]
+```
+
+No docker networking, and it works whether or not you run a chain-1 node.
+
+> [!IMPORTANT]
+> **No path on the end** — not `/rpc`, not a trailing path of any kind. The node
+> subscribes to the root chain over a websocket and builds that URL from the
+> **hostname only**, discarding whatever path you configured. A URL with a path
+> connects over TLS and then 404s on every subscribe, and the node reports
+> `Empty root chain info` and `not subscribed` — which reads like a peering or
+> staking problem rather than a URL problem.
+
+**Using your own chain-1 node instead.** If it runs on this same machine, the
+two stacks are separate compose projects on separate docker networks, so the
+container cannot reach it by name by default. Start with the overlay:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.rootchain-local.yml up -d
+```
+
+and set `"url": "http://node:50002"`. See that file for what it does and how to
+point it at a differently-named chain-1 stack.
 
 ## 2. Verify — before you stake
 

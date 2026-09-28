@@ -148,35 +148,35 @@ configs:
       wallet.{$$DOMAIN} {
       	@protected not path /rpc*
       	import auth @protected
-      	import api_routes node:50002 node:50003
+      	import api_routes canoliq:50002 canoliq:50003
       	handle {
-      		reverse_proxy node:50000
+      		reverse_proxy canoliq:50000
       	}
       }
 
       explorer.{$$DOMAIN} {
       	@protected path /adminrpc*
       	import auth @protected
-      	import api_routes node:50002 node:50003
+      	import api_routes canoliq:50002 canoliq:50003
       	handle {
-      		reverse_proxy node:50001
+      		reverse_proxy canoliq:50001
       	}
       }
 
       rpc.{$$DOMAIN} {
       	rewrite / /v1/eth
-      	reverse_proxy node:50002
+      	reverse_proxy canoliq:50002
       }
 
       adminrpc.{$$DOMAIN} {
       	import auth
       	@admin path /v1/admin/*
       	handle @admin {
-      		reverse_proxy node:50003
+      		reverse_proxy canoliq:50003
       	}
       	handle {
       		rewrite / /v1/tx
-      		reverse_proxy node:50002
+      		reverse_proxy canoliq:50002
       	}
       }
 

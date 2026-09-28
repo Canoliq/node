@@ -20,7 +20,7 @@ make gen-key      # or copy your existing config/validator_key.json + keystore.j
 Set three things:
 
 - `.env` → `DOMAIN=<your-public-host>`
-- `config/config.json` → `"rootChain": [{ "chainId": 1, "url": "<your-chain-1-rpc>" }]`
+- `config/config.json` → `"rootChain": [{ "chainId": 1, "url": "https://root.net.app.canopynetwork.org" }]`
 - Open inbound **TCP 9029** (host firewall *and* cloud/provider firewall)
 
 ```bash
@@ -33,8 +33,22 @@ docker compose up -d
 > the node advertises `localhost` and no peer can reach it, while `config.json`
 > still looks correct.
 
-Your chain-1 node is the natural root chain: point `rootChain` at it rather
-than a public endpoint if it is reachable from this container.
+> [!IMPORTANT]
+> Put **no path** on the `rootChain` URL — not `/rpc`, nothing. The node builds
+> its websocket URL from the hostname alone and drops the path, so a URL with
+> one connects over TLS and 404s on every subscribe. The symptom is a loop of
+> `Empty root chain info` and `not subscribed`, which looks like a peering or
+> staking fault and is neither.
+
+**Prefer your own chain-1 node?** It works, but it is more setup, because the
+two stacks are separate compose projects on separate docker networks. Use the
+overlay and keep the container name:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.rootchain-local.yml up -d
+```
+
+with `"url": "http://node:50002"`.
 
 ## 2. Verify — before you stake
 
