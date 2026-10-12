@@ -44,11 +44,18 @@ docker compose up -d
 > wins. Set `DOMAIN` as well, or the node advertises `localhost` and no peer
 > can reach it — while `config.json` still looks correct.
 
-**On `rootChain`.** Chain 29 follows chain 1, so the node needs a chain-1 RPC.
-If you already run a chain-1 node on this box — most committee members do —
-point it there over the local docker network (e.g.
-`http://node:50002`); it is lower latency than a public endpoint and one less
-third party in your consensus path. Otherwise use any chain-1 RPC you trust.
+**On `rootChain`.** Chain 29 follows chain 1, so the node needs the RPC
+(port 50002) of a **chain-1** node, as reachable from inside this container.
+Your own chain-1 node is best: lower latency and one less third party in your
+consensus path.
+
+- **Chain-1 node on another server** (for example, your consensus validator):
+  use `http://<chain-1-host>:50002`, and allow only this server's IP on that port.
+- **Chain-1 node on the same server:** use the host's IP, or attach both
+  containers to a shared Docker network and use the chain-1 container's name.
+- **Don't use `http://node:50002`.** In this compose file, `node` is the
+  canoLiq node itself, so it would read its own chain-29 RPC as the root chain
+  and stay at height 0. Leave out the trailing slash too.
 
 ## 2. Verify — before you stake
 
@@ -75,6 +82,10 @@ docker exec canoliq-node wget -qO- http://127.0.0.1:8587/v1/health
 # 4. your P2P port is reachable FROM OUTSIDE (run this somewhere else)
 nc -z <your-host> 9029
 ```
+
+If height stays at **0** and the plugin health shows `"genesisComplete": false`,
+the node isn't following chain 1. Check `rootChain` first (see above):
+`docker logs canoliq-node 2>&1 | grep -i root | tail`.
 
 If height sticks at **4679** with `unequal block hash` in the logs, your plugin
 config is missing or wrong — see "Why the plugin config matters" below.
