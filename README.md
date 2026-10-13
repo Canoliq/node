@@ -44,6 +44,14 @@ docker compose up -d
 > wins. Set `DOMAIN` as well, or the node advertises `localhost` and no peer
 > can reach it — while `config.json` still looks correct.
 
+> [!NOTE]
+> **Upgrading from an earlier version of this repo?** The compose service was
+> renamed from `node` to `canoliq-node` (the container name is unchanged). After
+> `git pull`, recreate it once:
+> `docker compose down && docker compose up -d`. Chain data in `./data` is kept.
+> Validators: the node is offline for a few seconds, so expect to miss at most
+> a block or two.
+
 **On `rootChain`.** Chain 29 follows chain 1, so the node needs the RPC
 (port 50002) of a **chain-1** node, as reachable from inside this container.
 Your own chain-1 node is best: lower latency and one less third party in your
@@ -51,11 +59,16 @@ consensus path.
 
 - **Chain-1 node on another server** (for example, your consensus validator):
   use `http://<chain-1-host>:50002`, and allow only this server's IP on that port.
-- **Chain-1 node on the same server:** use the host's IP, or attach both
-  containers to a shared Docker network and use the chain-1 container's name.
-- **Don't use `http://node:50002`.** In this compose file, `node` is the
-  canoLiq node itself, so it would read its own chain-29 RPC as the root chain
-  and stay at height 0. Leave out the trailing slash too.
+- **Chain-1 node on the same server** (the standard Canopy `node` compose):
+  1. In `docker-compose.yml`, uncomment the `networks` block under
+     `canoliq-node` and the top-level `networks` block at the end.
+  2. Check the chain-1 network name with `docker network ls`. It is
+     `<directory>_default` of the chain-1 compose project, so `node_default`
+     when that repo lives in `./node`. Set it as `name:`.
+  3. Use `"url": "http://node:50002"`, where `node` is the chain-1 container on
+     that shared network.
+- **Without the shared network,** `node` doesn't resolve from this container.
+  Use the chain-1 host's IP instead. Leave out the trailing slash.
 
 ## 2. Verify — before you stake
 
@@ -96,7 +109,7 @@ If height sticks at **2** with `unequal block hash` (a different `stateRoot`),
 every block and diverges immediately. Use this repo's `config.json` as-is.
 
 If the container restart-loops with `canopy binary not found` after you wiped
-`data/`, recreate it: `docker compose up -d --force-recreate node`. The image
+`data/`, recreate it: `docker compose up -d --force-recreate canoliq-node`. The image
 links `/bin/cli` to a file inside the data directory, and wiping the directory
 breaks the link inside the old container.
 

@@ -23,10 +23,10 @@ hash-password: ## Generate a bcrypt hash for AUTH_PASSWORDHASH (prompts for pass
 	@echo "Copy the exact line above into .env"
 
 pull: ## Pull the latest canopynetwork/canopy-plugin-go image
-	$(FULL_COMPOSE) pull node
+	$(FULL_COMPOSE) pull canoliq-node
 
 node-up: ## Start the node only (no monitoring)
-	docker compose -f $(NODE_COMPOSE) up -d node
+	docker compose -f $(NODE_COMPOSE) up -d canoliq-node
 
 up: ## Starts everything (node, monitoring, etc.)
 	$(FULL_COMPOSE) up -d
@@ -35,10 +35,10 @@ down: ## Stop everything
 	$(FULL_COMPOSE) --profile monitoring down
 
 restart: ## Restart the nodes (reload config.json changes)
-	$(FULL_COMPOSE) restart node
+	$(FULL_COMPOSE) restart canoliq-node
 
 logs: ## Tail node logs
-	docker compose -f $(NODE_COMPOSE) logs -f node --tail 200
+	docker compose -f $(NODE_COMPOSE) logs -f canoliq-node --tail 200
 
 status: ## Show container status
 	$(FULL_COMPOSE) ps
