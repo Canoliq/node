@@ -9,9 +9,10 @@ endif
 
 NODE_COMPOSE := docker-compose.yml
 MONITORING_COMPOSE := docker-compose.monitoring.yml
+ROOTCHAIN_COMPOSE := docker-compose.rootchain-local.yml
 FULL_COMPOSE := docker compose -f $(NODE_COMPOSE) -f $(MONITORING_COMPOSE)
 
-.PHONY: help hash-password up down restart logs status validate gen-key snapshot snapshot-up
+.PHONY: help hash-password up down restart logs status validate gen-key snapshot snapshot-up node-up node-up-local-rootchain
 
 help: ## Show available targets
 	@grep -hE '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -27,6 +28,9 @@ pull: ## Pull the latest canopynetwork/canopy-plugin-go image
 
 node-up: ## Start the node only (no monitoring)
 	docker compose -f $(NODE_COMPOSE) up -d canoliq-node
+
+node-up-local-rootchain: ## Start the node, joined to a chain-1 node on this machine
+	docker compose -f $(NODE_COMPOSE) -f $(ROOTCHAIN_COMPOSE) up -d canoliq-node
 
 up: ## Starts everything (node, monitoring, etc.)
 	$(FULL_COMPOSE) up -d
