@@ -1,5 +1,7 @@
 services:
-  node:
+  # Service and container are both `canoliq-node`, so this stack never clashes
+  # with a chain-1 node (service `node`) on the same host or Docker network.
+  canoliq-node:
     # canoLiq runs a custom plugin. The stock `canopynetwork/canopy` image has
     # no plugin/auto-update logic, so a node built on it will never load the
     # canoLiq protocol.
@@ -46,6 +48,12 @@ services:
         limits:
           memory: 4G
           cpus: "2.0"
+    # Uncomment if a chain-1 node runs on the same host (see README "On
+    # rootChain"): joins its Docker network so rootChain can be
+    # http://node:50002. Keep `default`, or the monitoring stack loses this node.
+    #networks:
+    #  - default
+    #  - chain1
 
   # First-time setup: generate validator credentials into ./config
   # (creates keystore.json and validator_key.json). See `make init-keys`.
@@ -60,3 +68,12 @@ services:
 secrets:
   validator_key:
     file: ./config/validator_key.json
+
+# Uncomment together with `networks` above. The chain-1 node's network already
+# exists; it is `<directory>_default` of the chain-1 compose project
+# (`node_default` when that repo was cloned into ./node). Check with
+# `docker network ls`.
+#networks:
+#  chain1:
+#    external: true
+#    name: node_default

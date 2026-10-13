@@ -14,7 +14,7 @@ else
 	echo "  $SNAPSHOT_URL"
 fi
 
-docker compose stop node || true
+docker compose stop canoliq-node || true
 
 echo "==== downloading snapshot ===="
 wget -O snapshot.tar.gz "$SNAPSHOT_URL"
@@ -31,5 +31,5 @@ fi
 rm -f snapshot.tar.gz
 echo "==== chain data restored ===="
 
-docker compose up -d node
+docker compose up -d canoliq-node
 echo "==== node restarted from snapshot ===="
