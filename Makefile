@@ -11,7 +11,7 @@ NODE_COMPOSE := docker-compose.yml
 MONITORING_COMPOSE := docker-compose.monitoring.yml
 FULL_COMPOSE := docker compose -f $(NODE_COMPOSE) -f $(MONITORING_COMPOSE)
 
-.PHONY: help hash-password up down restart logs status validate gen-key
+.PHONY: help hash-password up down restart logs status validate gen-key snapshot snapshot-up
 
 help: ## Show available targets
 	@grep -hE '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -42,6 +42,11 @@ logs: ## Tail node logs
 
 status: ## Show container status
 	$(FULL_COMPOSE) ps
+
+snapshot: ## Restore chain data from the public canoLiq snapshot (stops the node first)
+	./scripts/snapshot.sh
+
+snapshot-up: snapshot up ## Restore from snapshot, then start everything
 
 gen-key: ## First-boot: generate validator key
 	@docker run --rm -it \
