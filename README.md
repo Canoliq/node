@@ -20,7 +20,7 @@ transcribe.
 - A server with `docker`
 - Inbound **TCP 9029** open (host firewall *and* cloud/provider firewall)
 - A publicly reachable hostname that resolves **directly** to the server (see Ports)
-- A **chain-1 RPC** to use as the root chain — your own chain-1 node, or a public one
+- A **chain-1 RPC** to use as the root chain. `config.json` ships with Canopy's public one; your own chain-1 node is better if you run one
 
 ## 1. Run the node
 
@@ -31,9 +31,9 @@ cd canoliq-node
 # generate config/keystore.json + config/validator_key.json
 make gen-key
 
-# fill in the two placeholders in config/config.json:
-#   "rootChain": [{ "chainId": 1, "url": "<your-chain-1-rpc>" }]
+# fill in the placeholder in config/config.json:
 #   "externalAddress": "tcp://<your-public-host>"     (validators must be dialable)
+# rootChain defaults to Canopy's public chain-1 RPC; see "On rootChain" to use your own
 
 docker compose up -d
 ```
@@ -51,24 +51,40 @@ docker compose up -d
 > `docker compose down && docker compose up -d`. Chain data in `./data` is kept.
 > Validators: the node is offline for a few seconds, so expect to miss at most
 > a block or two.
+>
+> - If you edited `config/config.json`, `git pull` may refuse to overwrite it:
+>   `git stash && git pull && git stash pop`, then keep your own `rootChain`.
+> - If you uncommented the `networks` blocks in `docker-compose.yml` from the
+>   previous version, revert them (`git checkout docker-compose.yml`) and use
+>   `make node-up-local-rootchain` instead.
 
 **On `rootChain`.** Chain 29 follows chain 1, so the node needs the RPC
 (port 50002) of a **chain-1** node, as reachable from inside this container.
-Your own chain-1 node is best: lower latency and one less third party in your
-consensus path.
 
-- **Chain-1 node on another server** (for example, your consensus validator):
-  use `http://<chain-1-host>:50002`, and allow only this server's IP on that port.
-- **Chain-1 node on the same server** (the standard Canopy `node` compose):
-  1. In `docker-compose.yml`, uncomment the `networks` block under
-     `canoliq-node` and the top-level `networks` block at the end.
-  2. Check the chain-1 network name with `docker network ls`. It is
-     `<directory>_default` of the chain-1 compose project, so `node_default`
-     when that repo lives in `./node`. Set it as `name:`.
-  3. Use `"url": "http://node:50002"`, where `node` is the chain-1 container on
-     that shared network.
-- **Without the shared network,** `node` doesn't resolve from this container.
-  Use the chain-1 host's IP instead. Leave out the trailing slash.
+- **Default:** `config.json` points at Canopy's public chain-1 RPC
+  (`https://root.net.app.canopynetwork.org`). It works out of the box, with no
+  Docker networking.
+- **Your own chain-1 node** is better if you run one: lower latency and one less
+  third party in your consensus path.
+  - **On another server** (for example, your consensus validator): use
+    `http://<chain-1-host>:50002`, and allow only this server's IP on that port.
+  - **On the same server** (the standard `canopy-network/node` compose, run
+    as-is): start with `make node-up-local-rootchain`, which adds
+    `docker-compose.rootchain-local.yml` and joins the chain-1 node's Docker
+    network, then use `"url": "http://node:50002"`. If you cloned the chain-1
+    repo into a folder other than `node`, set `ROOT_CHAIN_NETWORK` in `.env`
+    (`docker network ls` shows the name).
+- **The URL must be scheme, host and port only.** No path and no trailing
+  slash: the node builds its websocket URL from the host and drops the path, so
+  a URL ending in `/rpc` connects and then fails every subscription with
+  `Empty root chain info` / `not subscribed`, which looks like a peering fault.
+
+> [!NOTE]
+> **Monitoring on a shared host.** `docker-compose.monitoring.yml` uses the same
+> container names (`caddy`, `prometheus`, `grafana`, ...) and host ports 80/443
+> as the chain-1 repo's monitoring stack, so only one of the two can run on a
+> machine. If chain-1 monitoring is already up, start just the node
+> (`make node-up` or `make node-up-local-rootchain`).
 
 ## 2. Verify — before you stake
 

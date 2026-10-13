@@ -1,0 +1,42 @@
+# Use this when your chain-1 node runs on the SAME machine.
+#
+#   make node-up-local-rootchain
+#   # or: docker compose -f docker-compose.yml -f docker-compose.rootchain-local.yml up -d canoliq-node
+#
+# then in config/config.json:
+#
+#   "rootChain": [{ "chainId": 1, "url": "http://node:50002" }]
+#
+# It assumes chain-1 is https://github.com/canopy-network/node run as-is: its
+# container is named "node" and its compose network is named after the folder
+# it was cloned into, "node_default" for a plain `git clone`. If you cloned it
+# somewhere else, set ROOT_CHAIN_NETWORK in .env (`docker network ls` shows the
+# real name).
+#
+# WHY A SHARED NETWORK, AND NOT host.docker.internal
+#
+# The chain-1 compose only `expose`s 50002; it does not publish it to the host.
+# A host-gateway route reaches the host and finds nothing listening on 50002,
+# and on Linux "host.docker.internal" does not even resolve without an
+# extra_hosts entry. Making that work means editing the chain-1 repo to publish
+# its RPC, which also exposes the admin RPC on the host. Joining the network
+# needs no change on the chain-1 side.
+#
+# WITHOUT this file the node still runs: config/config.json defaults to Canopy's
+# public root-chain RPC. This file only exists for the same-machine case.
+
+services:
+  canoliq-node:
+    networks:
+      # Keep the stack's own network; without it the monitoring services can no
+      # longer reach this container.
+      - default
+      - rootchain
+
+networks:
+  rootchain:
+    # Not created here: this is the chain-1 stack's network, which must already
+    # exist. Compose fails fast with "network not found" if chain-1 is not up,
+    # which is better than a node that starts and cannot follow the root chain.
+    external: true
+    name: ${ROOT_CHAIN_NETWORK:-node_default}

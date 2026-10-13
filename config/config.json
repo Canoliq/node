@@ -5,7 +5,7 @@
   "rootChain": [
     {
       "chainId": 1,
-      "url": "<your-chain-1-rpc>"
+      "url": "https://root.net.app.canopynetwork.org"
     }
   ],
   "runVDF": true,

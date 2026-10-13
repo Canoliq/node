@@ -20,7 +20,7 @@ make gen-key      # or copy your existing config/validator_key.json + keystore.j
 Set three things:
 
 - `.env` → `DOMAIN=<your-public-host>`
-- `config/config.json` → `"rootChain": [{ "chainId": 1, "url": "<your-chain-1-rpc>" }]`
+- `config/config.json` → `rootChain` already points at Canopy's public chain-1 RPC. To use your own chain-1 node, see "On rootChain" in the README (same machine: `make node-up-local-rootchain` and `http://node:50002`).
 - Open inbound **TCP 9029** (host firewall *and* cloud/provider firewall)
 
 ```bash
@@ -34,7 +34,8 @@ docker compose up -d
 > still looks correct.
 
 Your chain-1 node is the natural root chain: point `rootChain` at it rather
-than a public endpoint if it is reachable from this container.
+than the public endpoint if it is reachable from this container. Use scheme,
+host and port only, with no path.
 
 ## 2. Verify — before you stake
 
