@@ -24,18 +24,41 @@ transcribe.
 
 ## 1. Run the node
 
+**1. Clone**
+
 ```bash
 git clone https://github.com/Canoliq/node.git canoliq-node
 cd canoliq-node
+```
 
-# generate config/keystore.json + config/validator_key.json
-make gen-key
+**2. Create `.env` and set `DOMAIN`** to your server's public hostname. On the
+same server as a chain-1 node, use the same `DOMAIN` as that node; the two are
+told apart by port (9001 vs 9029).
 
-# fill in the placeholder in config/config.json:
-#   "externalAddress": "tcp://<your-public-host>"     (validators must be dialable)
-# rootChain defaults to Canopy's public chain-1 RPC; see "On rootChain" to use your own
+```bash
+cp .env.example .env
+```
 
-docker compose up -d
+**3. Key.** Pick one; don't paste this blindly.
+
+- **Full node:** `make gen-key` creates a fresh `config/validator_key.json` and
+  `config/keystore.json`.
+- **Validator:** copy your chain-1 validator's `validator_key.json` and
+  `keystore.json` into `config/` instead. Never run two chain-29 nodes with the
+  same key.
+
+**4. Root chain.** `rootChain` in `config/config.json` defaults to Canopy's
+public chain-1 RPC, so there is nothing to change unless a chain-1 node runs on
+this server. See "On rootChain" below.
+
+**5. Optional: snapshot.** `make snapshot` restores the latest chain-29
+snapshot (~800 MB) instead of syncing from genesis (~25 minutes).
+
+**6. Start**
+
+```bash
+make node-up                   # public root chain
+make node-up-local-rootchain   # chain-1 node on this server (see "On rootChain")
 ```
 
 > [!IMPORTANT]
@@ -130,10 +153,10 @@ links `/bin/cli` to a file inside the data directory, and wiping the directory
 breaks the link inside the old container.
 
 > [!NOTE]
-> **There is no snapshot, and you do not need one.** Chain 29 is young, so a
-> node syncs from genesis to the tip in roughly twenty minutes. (The snapshot
-> tooling this repo inherited was for chain-1 mainnet archives and has been
-> removed — restoring one here would give you the wrong chain's data.)
+> **Snapshot.** `make snapshot` restores chain 29's published snapshot from
+> `SNAPSHOT_URL` in `.env` (already set). It must be chain 29's: the generic
+> canopy-1 snapshot is the root chain's data and would restore the wrong chain.
+> Syncing from genesis without it takes about 25 minutes.
 
 ## 3. Join the committee — last, not first
 
