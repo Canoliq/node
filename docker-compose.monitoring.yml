@@ -1,6 +1,6 @@
 services:
   caddy:
-    image: caddy:2.11-alpine
+    image: caddy:2.11.7-alpine  # `make hash-password` reads this tag
     container_name: caddy
     restart: unless-stopped
     ports:
@@ -9,7 +9,8 @@ services:
     environment:
       DOMAIN: ${DOMAIN:-localhost}
       AUTH_USER: ${AUTH_USER:-canopy}
-      AUTH_PASSWORDHASH: ${AUTH_PASSWORDHASH:-"$$2a$$14$$0IP2/ZvbwWQ0JsJp6B8IpOYxME/6KSuPY3l4Hpj8phNTMdjMdh8aa"} # canopy
+      # No default on purpose: a published default hash is a known credential.
+      AUTH_PASSWORDHASH: ${AUTH_PASSWORDHASH:?set AUTH_PASSWORDHASH in .env (run make hash-password)}
     configs:
       - source: caddyfile
         target: /etc/caddy/Caddyfile
@@ -59,15 +60,18 @@ services:
       - /sys:/sys:ro
 
   grafana:
-    image: grafana/grafana:12.3
+    image: grafana/grafana:12.3.11
     container_name: grafana
     restart: unless-stopped
-    # served through caddy at https://monitoring.<DOMAIN>
+    # served through caddy at https://monitoring.<DOMAIN> (basic-auth, then
+    # Grafana's own login)
     expose:
       - "3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GF_ADMIN_USER:-canopy}
-      GF_SECURITY_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD:-canopy}
+      # No default on purpose. Grafana only applies this on first start; to
+      # change an existing password see README "Monitoring".
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD:?set GF_ADMIN_PASSWORD in .env}
       GF_USERS_ALLOW_SIGN_UP: "false"
     configs:
       - source: grafana_datasources
@@ -83,7 +87,8 @@ services:
     container_name: loki
     restart: unless-stopped
     command: ["--config.file=/etc/loki/config.yaml"]
-    # served through caddy at https://loki.<DOMAIN> (basic-auth)
+    # internal only: not routed through caddy. Grafana and Alloy reach it on
+    # the compose network.
     expose:
       - "3100"
     configs:
@@ -139,6 +144,14 @@ configs:
       	}
       }
 
+      # Metrics endpoints are for the internal Prometheus only, never the
+      # public internet.
+      (no_metrics) {
+      	handle /metrics* {
+      		respond 404
+      	}
+      }
+
       (auth) {
       	basic_auth {args[:]} {
       		{$$AUTH_USER} {$$AUTH_PASSWORDHASH}
@@ -146,6 +159,7 @@ configs:
       }
 
       wallet.{$$DOMAIN} {
+      	import no_metrics
       	@protected not path /rpc*
       	import auth @protected
       	import api_routes canoliq-node:50002 canoliq-node:50003
@@ -155,6 +169,7 @@ configs:
       }
 
       explorer.{$$DOMAIN} {
+      	import no_metrics
       	@protected path /adminrpc*
       	import auth @protected
       	import api_routes canoliq-node:50002 canoliq-node:50003
@@ -164,11 +179,13 @@ configs:
       }
 
       rpc.{$$DOMAIN} {
+      	import no_metrics
       	rewrite / /v1/eth
       	reverse_proxy canoliq-node:50002
       }
 
       adminrpc.{$$DOMAIN} {
+      	import no_metrics
       	import auth
       	@admin path /v1/admin/*
       	handle @admin {
@@ -181,7 +198,15 @@ configs:
       }
 
       monitoring.{$$DOMAIN} {
-      	reverse_proxy grafana:3000
+      	import no_metrics
+      	import auth
+      	handle {
+      		reverse_proxy grafana:3000 {
+      			# Caddy already checked these credentials; don't hand them to
+      			# Grafana, which would try them as a Grafana login.
+      			header_up -Authorization
+      		}
+      	}
       }
 
   prometheus_config:

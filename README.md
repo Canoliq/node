@@ -42,10 +42,11 @@ cp .env.example .env
 **3. Key.** Pick one; don't paste this blindly.
 
 - **Full node:** `make gen-key` creates a fresh `config/validator_key.json` and
-  `config/keystore.json`.
+  `config/keystore.json` (mode `600`).
 - **Validator:** copy your chain-1 validator's `validator_key.json` and
-  `keystore.json` into `config/` instead. Never run two chain-29 nodes with the
-  same key.
+  `keystore.json` into `config/` instead, then
+  `chmod 600 config/validator_key.json config/keystore.json`. Never run two
+  chain-29 nodes with the same key. See "Security" below.
 
 **4. Root chain.** `rootChain` in `config/config.json` defaults to Canopy's
 public chain-1 RPC, so there is nothing to change unless a chain-1 node runs on
@@ -97,6 +98,10 @@ make node-up-local-rootchain   # chain-1 node on this server (see "On rootChain"
     network, then use `"url": "http://node:50002"`. If you cloned the chain-1
     repo into a folder other than `node`, set `ROOT_CHAIN_NETWORK` in `.env`
     (`docker network ls` shows the name).
+- **Use TLS or a private network.** The node trusts what the root chain tells
+  it. `https://` is fine anywhere; plain `http://` only over a private link
+  (same host, Docker network, VPN/WireGuard, or a provider private network),
+  never across the public internet.
 - **The URL must be scheme, host and port only.** No path and no trailing
   slash: the node builds its websocket URL from the host and drops the path, so
   a URL ending in `/rpc` connects and then fails every subscription with
@@ -157,6 +162,11 @@ breaks the link inside the old container.
 > `SNAPSHOT_URL` in `.env` (already set). It must be chain 29's: the generic
 > canopy-1 snapshot is the root chain's data and would restore the wrong chain.
 > Syncing from genesis without it takes about 25 minutes.
+>
+> The archive is checked against `SNAPSHOT_SHA256` (in `.env`) or, if that is
+> empty, `<SNAPSHOT_URL>.sha256` when the server publishes one. A mismatch
+> aborts before anything is wiped; with no checksum at all the script warns
+> that the download is unverified. Files are extracted with `--no-same-owner`.
 
 ## 3. Join the committee — last, not first
 
@@ -219,6 +229,57 @@ not the chain data.
 > you advertise sits behind one, peers cannot reach you no matter how the node
 > itself is configured — point a plain DNS record at the server instead.
 
+## Security
+
+**Key files.** `validator_key.json` is the validator's private key and
+`keystore.json` holds key material too. Keep both mode `600` (`make gen-key`
+does this; for copied keys run
+`chmod 600 config/validator_key.json config/keystore.json`), never commit
+them (they are in `.gitignore`), and keep an offline backup. Anyone with the
+key can sign as your validator, including a double-sign that gets you slashed.
+
+**Docker-published ports bypass `ufw`.** Docker writes its own iptables rules,
+so a port listed under `ports:` is reachable from the internet even if `ufw`
+or a host firewall says otherwise. This stack publishes `9029` (P2P, must be
+public) and, with monitoring, `80`/`443` (Caddy). If you add more published
+ports, either bind them to loopback (`"127.0.0.1:50002:50002"`) or filter them
+in the `DOCKER-USER` chain, for example:
+
+```bash
+# allow one admin IP to a published port, drop everyone else
+iptables -I DOCKER-USER -p tcp --dport 50002 ! -s <your-admin-ip> -j DROP
+```
+
+The RPC/admin ports (`50000`–`50003`, `8587`) and Prometheus metrics (`9090`)
+are only `expose`d on the Docker network by default; keep it that way.
+
+**Root chain.** See "On `rootChain`": `https://`, or a private network.
+
+## Updates
+
+By default the node updates itself. The image is
+`canopynetwork/canopy-plugin-go:latest`, and `config/config.json` has
+`"autoUpdate": true` and `"pluginAutoUpdate": {"enabled": true, ...}`, so new
+canopy and canoLiq plugin releases are downloaded and run without operator
+action. This is deliberate: canoLiq ships consensus changes as plugin releases
+pinned to future heights, and a node that misses one falls off the chain at
+the activation height.
+
+If your policy requires reviewing code before it runs, you can opt out — but
+you then own every upgrade, on time:
+
+- Pin the image in `.env`:
+  `CANOLIQ_NODE_IMAGE=canopynetwork/canopy-plugin-go@sha256:<digest>`
+  (also used by `make gen-key` and `make pull`).
+- Set `"autoUpdate": false` and `"pluginAutoUpdate": {"enabled": false, ...}`
+  in `config/config.json`, then `make restart`.
+- Watch the [canoLiq releases](https://github.com/Canoliq/canoliq/releases)
+  and upgrade before each activation height.
+
+The monitoring images (Caddy, Grafana, Prometheus, ...) are pinned to exact
+versions in `docker-compose.monitoring.yml`; `make hash-password` uses the
+same Caddy version as the stack.
+
 ## Getting the current committee peers
 
 The dial peer in `config/config.json` is the canoLiq team's validator. To see
@@ -238,8 +299,32 @@ explicitly makes it dial 9029 + 29 = **9058**, which nobody listens on.
 
 ## Monitoring
 
-`docker-compose.monitoring.yml` adds Prometheus, Loki, Alloy and Grafana.
+`docker-compose.monitoring.yml` adds Caddy, Prometheus, Loki, Alloy and
+Grafana.
+
+Set credentials first; there are no defaults:
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
+make hash-password            # paste the AUTH_PASSWORDHASH=... line into .env
+# and set GF_ADMIN_PASSWORD=<strong password> in .env
+make up
 ```
+
+`make up` refuses to start if `AUTH_PASSWORDHASH` or `GF_ADMIN_PASSWORD` is
+empty, and every `make up` / `make node-up` refuses the old published example
+values (the example hash, or Grafana password `canopy`). Run `make check-env`
+to check without starting anything.
+
+- `wallet.`, `adminrpc.` and `monitoring.<DOMAIN>` (Grafana) are behind Caddy
+  basic-auth (`AUTH_USER` / `AUTH_PASSWORDHASH`); Grafana then asks for its own
+  login. `/metrics` is not served on any public hostname; Prometheus scrapes
+  over the internal Docker network.
+- Loki, Prometheus and Alertmanager are internal only.
+
+> [!IMPORTANT]
+> **Upgrading an existing monitoring stack.** Grafana stores its admin
+> password on first start; changing `GF_ADMIN_PASSWORD` later does not change
+> it. If your Grafana still uses `canopy`, reset it:
+> `docker exec grafana grafana cli admin reset-admin-password '<new password>'`
+> and put the same value in `.env`. Also replace an example
+> `AUTH_PASSWORDHASH` with your own (`make hash-password`), then `make up`.
