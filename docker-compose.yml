@@ -8,7 +8,12 @@ services:
     # canoLiq runs a custom plugin. The stock `canopynetwork/canopy` image has
     # no plugin/auto-update logic, so a node built on it will never load the
     # canoLiq protocol.
-    image: canopynetwork/canopy-plugin-go:latest
+    #
+    # `:latest` together with `autoUpdate` / `pluginAutoUpdate` in config.json
+    # means the node downloads and runs new code without operator action. That
+    # is the default because canoLiq ships consensus changes as height-gated
+    # releases. To pin, set CANOLIQ_NODE_IMAGE in .env (see README "Updates").
+    image: ${CANOLIQ_NODE_IMAGE:-canopynetwork/canopy-plugin-go:latest}
     container_name: canoliq-node
     restart: unless-stopped
     command: ["start", "--external-address", "${DOMAIN:-localhost}"]
@@ -53,11 +58,13 @@ services:
           cpus: "2.0"
 
   # First-time setup: generate validator credentials into ./config
-  # (creates keystore.json and validator_key.json). See `make init-keys`.
+  # (creates keystore.json and validator_key.json, mode 600). See `make gen-key`.
   keygen:
-    image: canopynetwork/canopy-plugin-go:latest
-    entrypoint: /bin/cli
-    command: ["new-validator-key", "--data-dir", "/app/config"]
+    image: ${CANOLIQ_NODE_IMAGE:-canopynetwork/canopy-plugin-go:latest}
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - umask 077 && /bin/cli new-validator-key --data-dir /app/config && chmod 600 /app/config/validator_key.json /app/config/keystore.json
     volumes:
       - ./config:/app/config
     profiles: ["tools"]
